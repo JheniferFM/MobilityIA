@@ -28,13 +28,13 @@ export default function AIAssistant() {
       id: "1",
       type: "assistant",
       content:
-        "Olá! Sou o assistente de mobilidade do Mobility IA. Como posso ajudá-lo a se locomover pelo DF hoje?",
+        "Oi! Eu sou a sua ajuda pra se locomover melhor pelo DF. Posso te sugerir rota, horário e até dizer quando a viagem costuma ficar mais tranquila.",
       timestamp: new Date(),
       suggestions: [
         "Preciso ir de Planaltina para Taguatinga às 18h",
-        "Qual a melhor rota de Ceilândia para o Plano Piloto?",
-        "Ônibus para o Gama agora",
-        "Rotas menos lotadas",
+        "Qual a melhor hora para sair hoje?",
+        "Quero evitar ônibus lotado",
+        "Me ajuda a escolher uma rota",
       ],
     },
   ]);
@@ -43,10 +43,16 @@ export default function AIAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   };
 
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToBottom();
   }, [messages]);
 
@@ -100,6 +106,16 @@ export default function AIAssistant() {
       const greetingWords = ["oi", "ola", "eai", "opa", "bom dia", "boa tarde", "boa noite"];
       const isGreeting = greetingWords.some((word) => normalized.includes(word)) && normalized.length <= 20;
       const isThanks = ["obrigado", "obrigada", "valeu", "vlw"].some((word) => normalized.includes(word));
+      const asksPurpose = [
+        "pra que serve",
+        "serve para que",
+        "o que voce faz",
+        "o que você faz",
+        "como voce ajuda",
+        "como você ajuda",
+        "para que voce serve",
+        "para que você serve",
+      ].some((phrase) => normalized.includes(phrase));
       const mentionsRouteIntent = ["rota", "onibus", "trajeto", "ir", "chegar", "mobilidade"].some((word) =>
         normalized.includes(word),
       );
@@ -109,23 +125,36 @@ export default function AIAssistant() {
           id: Date.now().toString(),
           type: "assistant",
           content:
-            "Oi! Bora achar sua melhor rota. Me fala de onde voce sai, para onde vai e o horario aproximado.",
+            "Oi! Tudo bem? Posso te ajudar a achar uma rota mais fácil, sem ficar adivinhando. Me fala de onde você sai, pra onde vai e mais ou menos que horas.",
           timestamp: new Date(),
           suggestions: [
-            "Saio de Ceilandia para Taguatinga as 18h",
-            "Quero ir de Sobradinho para UnB as 07h20",
+            "Saio de Ceilândia para Taguatinga às 18h",
+            "Quero ir de Sobradinho para UnB às 07h20",
             "De Samambaia para Asa Sul agora",
+          ],
+        };
+      } else if (asksPurpose) {
+        response = {
+          id: Date.now().toString(),
+          type: "assistant",
+          content:
+            "Eu sou tipo sua ajuda pra viajar com menos estresse. Posso comparar rotas, te dizer quando sair é melhor e te mostrar opções com menos lotação ou mais conforto.",
+          timestamp: new Date(),
+          suggestions: [
+            "Me mostra uma rota agora",
+            "Quero saber o melhor horário",
+            "Quero evitar ônibus lotado",
           ],
         };
       } else if (isThanks) {
         response = {
           id: Date.now().toString(),
           type: "assistant",
-          content: "Tamo junto. Se quiser, ja te passo uma alternativa mais rapida ou com menos lotacao.",
+          content: "Fica tranquilo, eu posso ajudar com outra viagem também. Se quiser, já monto outra opção agora.",
           timestamp: new Date(),
           suggestions: [
-            "Quero a rota mais rapida",
-            "Quero a rota com menos lotacao",
+            "Quero a rota mais rápida",
+            "Quero a rota com menos lotação",
             "Mostre outra alternativa",
           ],
         };
@@ -150,18 +179,18 @@ export default function AIAssistant() {
         const routeB = pickOne(routePool.filter((r) => r !== routeA), userHash + 7);
         const opening = pickOne(
           [
-            `Boa, montei uma rota de ${parsedTrip.from} para ${parsedTrip.to}.`,
-            `Perfeito, ja organizei uma opcao para ir de ${parsedTrip.from} ate ${parsedTrip.to}.`,
-            `Encontrei um trajeto eficiente de ${parsedTrip.from} para ${parsedTrip.to}.`,
+            `Perfeito — já pensei em uma opção pra ir de ${parsedTrip.from} até ${parsedTrip.to}.`,
+            `Acho que dá pra fazer essa viagem com menos stress. Veja a sugestão pra ${parsedTrip.from} → ${parsedTrip.to}.`,
+            `Tenho uma ideia que pode funcionar bem pra ir de ${parsedTrip.from} para ${parsedTrip.to}.`,
           ],
           userHash,
         );
         const rationale =
           crowdLevel === "high"
-            ? "Como e horario de pico, priorizei previsibilidade e menos risco de atraso."
+            ? "Como é horário de pico, eu priorizei uma rota que tende a ser mais previsível."
             : crowdLevel === "medium"
-            ? "Esse horario costuma ter fluxo moderado, entao equilibrei tempo e conforto."
-            : "Nesse horario o fluxo tende a ser mais leve, entao foquei em conforto e regularidade.";
+            ? "Esse horário costuma ter um fluxo meio intenso, então balanceei tempo e conforto."
+            : "Nesse período o trânsito costuma estar mais leve, então foquei em conforto e estabilidade.";
 
         response = {
           id: Date.now().toString(),
@@ -223,9 +252,9 @@ export default function AIAssistant() {
       } else {
         const fallbackReply = pickOne(
           [
-            "Pra eu te responder com sentido, me diz origem, destino e horario. Exemplo: de Samambaia para Asa Sul as 18h.",
-            "Me fala de onde voce sai, pra onde vai e o horario aproximado. A partir disso eu monto uma recomendacao melhor.",
-            "Com origem + destino + horario eu consigo te dar uma resposta mais certeira e menos generica.",
+            "Pra te ajudar de verdade, me fala de onde você sai, pra onde vai e mais ou menos que horas. Exemplo: de Samambaia para Asa Sul às 18h.",
+            "Eu consigo responder melhor quando você me diz origem, destino e horário. É só me passar esses três pontos.",
+            "Sem esses detalhes eu posso até tentar, mas fica mais fácil te dar uma resposta boa com origem, destino e horário.",
           ],
           userHash,
         );
@@ -290,14 +319,14 @@ export default function AIAssistant() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <div className="pt-20 pb-10 px-6">
-        <div className="mx-auto max-w-7xl space-y-6">
+      <div className="px-3 py-4 sm:px-6 sm:py-8">
+        <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Assistente IA de Mobilidade</h1>
-            <p className="mt-1 text-sm text-slate-600">Converse para receber recomendacoes de rota no DF.</p>
+            <p className="mt-1 text-sm text-slate-600">Pode falar normal — eu te ajudo a organizar a viagem.</p>
           </div>
           <div className="grid gap-6 lg:grid-cols-[1fr]">
-            <Card className="flex h-[600px] flex-col border-slate-200 shadow-sm overflow-hidden">
+            <Card className="flex h-[calc(100dvh-9rem)] min-h-[480px] max-h-[700px] flex-col border-slate-200 shadow-sm overflow-hidden sm:h-[600px]">
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-slate-50/50">
                 <AnimatePresence>

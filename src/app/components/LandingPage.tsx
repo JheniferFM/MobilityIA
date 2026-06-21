@@ -61,13 +61,6 @@ export function LandingPage() {
     },
   ];
 
-  const stats = [
-    { value: "60%", label: "Redução no tempo de espera" },
-    { value: "45%", label: "Menos trajetos ao Plano Piloto" },
-    { value: "30%", label: "Aumento na satisfação" },
-    { value: "25%", label: "Redução de emissões" },
-  ];
-
   const benefits = [
     "Previsibilidade total de horários e lotação",
     "Rotas alternativas evitando congestionamentos",
@@ -113,15 +106,6 @@ export function LandingPage() {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20">
-            {stats.map((stat, idx) => (
-              <Card key={idx} className="p-6 bg-white/10 backdrop-blur-md border-white/20">
-                <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-sm text-blue-100">{stat.label}</div>
-              </Card>
-            ))}
-          </div>
         </div>
       </section>
 

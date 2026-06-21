@@ -24,7 +24,7 @@ export function RootLayout() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 to-blue-50">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 mobility-accent-scanlines opacity-[0.14]"></div>
       <div aria-hidden="true" className="pointer-events-none absolute left-6 top-24 z-0 h-40 w-px bg-[linear-gradient(180deg,transparent,rgba(0,255,0,0.35),transparent)]"></div>
       <div aria-hidden="true" className="pointer-events-none absolute right-6 bottom-24 z-0 h-40 w-px bg-[linear-gradient(180deg,transparent,rgba(0,255,0,0.28),transparent)]"></div>
