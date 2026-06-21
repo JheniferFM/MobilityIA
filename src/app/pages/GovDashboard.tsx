@@ -1,4 +1,3 @@
-import { Navigation } from "../components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -174,7 +173,6 @@ export default function GovDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
       <div className="pt-20 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">

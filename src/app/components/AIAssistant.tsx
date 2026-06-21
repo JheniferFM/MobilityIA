@@ -71,7 +71,7 @@ export function AIAssistant() {
     {
       id: "1",
       type: "ai",
-      content: "Olá! Sou a IA do Nexus Mobility. Como posso ajudar você hoje?",
+      content: "Olá! Sou a IA do Mobility IA. Como posso ajudar você hoje?",
       suggestions: [
         "Ir de Planaltina para Taguatinga",
         "Melhor horário para viajar",
@@ -153,7 +153,7 @@ export function AIAssistant() {
           id: (Date.now() + 1).toString(),
           type: "ai",
           content:
-            "Sou a IA de mobilidade do Nexus Mobility. Posso montar rotas, prever lotação e sugerir o melhor horário para você sair.",
+            "Sou a IA de mobilidade do Mobility IA. Posso montar rotas, prever lotação e sugerir o melhor horário para você sair.",
           suggestions: ["Quero uma rota", "Melhor horário para viajar", "Rotas menos lotadas"],
         };
       } else if (asksHelp) {

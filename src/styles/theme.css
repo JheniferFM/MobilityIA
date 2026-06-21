@@ -39,6 +39,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --mobility-accent: #00ff00;
+  --mobility-accent-soft: rgba(0, 255, 0, 0.14);
+  --mobility-accent-faint: rgba(0, 255, 0, 0.06);
 }
 
 .dark {
@@ -76,6 +79,9 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  --mobility-accent: #00ff00;
+  --mobility-accent-soft: rgba(0, 255, 0, 0.18);
+  --mobility-accent-faint: rgba(0, 255, 0, 0.08);
 }
 
 @theme inline {
@@ -205,5 +211,23 @@
 
   .animation-delay-4000 {
     animation-delay: 4s;
+  }
+
+  .mobility-accent-lines {
+    background-image:
+      linear-gradient(90deg, transparent 0%, transparent 49.2%, var(--mobility-accent-faint) 49.2%, var(--mobility-accent-faint) 50%, transparent 50%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, transparent 49.2%, var(--mobility-accent-faint) 49.2%, var(--mobility-accent-faint) 50%, transparent 50%, transparent 100%);
+    background-size: 140px 140px;
+  }
+
+  .mobility-accent-divider {
+    background: linear-gradient(90deg, transparent, var(--mobility-accent-soft), transparent);
+  }
+
+  .mobility-accent-scanlines {
+    background-image:
+      linear-gradient(180deg, transparent 0%, transparent 48%, var(--mobility-accent-faint) 48%, var(--mobility-accent-faint) 50%, transparent 50%, transparent 100%),
+      repeating-linear-gradient(135deg, transparent 0 28px, var(--mobility-accent-faint) 28px 29px, transparent 29px 72px);
+    background-size: 100% 100%, 240px 240px;
   }
 }

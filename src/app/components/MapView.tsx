@@ -1,7 +1,6 @@
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { busLinesData } from "../../data/busLines";
 import {
@@ -16,6 +15,7 @@ import {
   TrafficCone,
 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
+import { AccessibilityInput } from "./AccessibilityInput";
 
 type CrowdLevel = "low" | "medium" | "high";
 
@@ -215,6 +215,7 @@ export function MapView() {
   const [origin, setOrigin] = useState("Rodoviária do Plano Piloto");
   const [destination, setDestination] = useState("Ceilândia Centro");
   const [departureTime, setDepartureTime] = useState("07:30");
+  const [analysisVersion, setAnalysisVersion] = useState(0);
   const [lastAnalyzedAt, setLastAnalyzedAt] = useState(() => new Date());
   const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
@@ -255,6 +256,7 @@ export function MapView() {
     const safeDestination = destination.trim() || "Destino não informado";
     const safeTime = departureTime || "07:30";
     setAnalysis(buildAnalysis(safeOrigin, safeDestination, safeTime));
+    setAnalysisVersion((current) => current + 1);
     setLastAnalyzedAt(new Date());
   };
 
@@ -279,10 +281,11 @@ export function MapView() {
               <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleAnalyzeRoute}>
                 <div className="relative space-y-2">
                   <Label htmlFor="origem">Origem</Label>
-                  <Input
+                  <AccessibilityInput
                     id="origem"
+                    type="text"
                     value={origin}
-                    onChange={(event) => setOrigin(event.target.value)}
+                    onChange={(value) => setOrigin(value)}
                     onFocus={() => setShowOriginSuggestions(true)}
                     onBlur={() => {
                       setTimeout(() => setShowOriginSuggestions(false), 120);
@@ -310,10 +313,11 @@ export function MapView() {
                 </div>
                 <div className="relative space-y-2">
                   <Label htmlFor="destino">Destino</Label>
-                  <Input
+                  <AccessibilityInput
                     id="destino"
+                    type="text"
                     value={destination}
-                    onChange={(event) => setDestination(event.target.value)}
+                    onChange={(value) => setDestination(value)}
                     onFocus={() => setShowDestinationSuggestions(true)}
                     onBlur={() => {
                       setTimeout(() => setShowDestinationSuggestions(false), 120);
@@ -341,11 +345,11 @@ export function MapView() {
                 </div>
                 <div className="space-y-2 sm:max-w-44">
                   <Label htmlFor="horario">Horário</Label>
-                  <Input
+                  <AccessibilityInput
                     id="horario"
                     type="time"
                     value={departureTime}
-                    onChange={(event) => setDepartureTime(event.target.value)}
+                    onChange={(value) => setDepartureTime(value)}
                   />
                 </div>
                 <div className="flex items-end">
@@ -361,7 +365,7 @@ export function MapView() {
 
               <div className="relative h-[540px] overflow-hidden rounded-xl border border-slate-200">
                 <iframe
-                  key={`${analysis.origin}-${analysis.destination}`}
+                  key={`${analysis.origin}-${analysis.destination}-${analysisVersion}`}
                   title="Mapa da rota recomendada"
                   src={googleMapsDirectionsSrc}
                   className="w-full h-full"

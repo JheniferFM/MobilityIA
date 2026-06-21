@@ -95,7 +95,7 @@ export default function LandingPage() {
               Powered by Artificial Intelligence
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Nexus Mobility AI
+              Mobility IA
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-3xl mx-auto">
               Conectando Brasília de forma inteligente, previsível e sustentável.
@@ -221,7 +221,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Pronto para transformar a mobilidade de Brasília?</h2>
           <p className="text-xl text-gray-600 mb-10">
-            Comece a usar o Nexus Mobility AI agora e experimente uma nova forma de se locomover pelo DF.
+            Comece a usar o Mobility IA agora e experimente uma nova forma de se locomover pelo DF.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/assistant">

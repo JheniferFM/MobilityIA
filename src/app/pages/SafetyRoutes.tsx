@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Navigation } from "../components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -175,7 +174,6 @@ export default function SafetyRoutes() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
       <div className="pt-20 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">

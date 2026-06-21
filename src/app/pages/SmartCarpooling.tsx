@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Navigation } from "../components/Navigation";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
@@ -7,6 +7,14 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import {
   Car,
   Users,
@@ -44,12 +52,7 @@ interface CarpoolOffer {
   amenities: string[];
 }
 
-export default function SmartCarpooling() {
-  const [searchFrom, setSearchFrom] = useState("Planaltina");
-  const [searchTo, setSearchTo] = useState("Taguatinga");
-  const [searchDate, setSearchDate] = useState("2026-06-18");
-
-  const offers: CarpoolOffer[] = [
+const INITIAL_OFFERS: CarpoolOffer[] = [
     {
       id: "1",
       driver: {
@@ -106,6 +109,30 @@ export default function SmartCarpooling() {
     },
   ];
 
+export default function SmartCarpooling() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchFrom, setSearchFrom] = useState("Planaltina");
+  const [searchTo, setSearchTo] = useState("Taguatinga");
+  const [searchDate, setSearchDate] = useState("2026-06-18");
+  const [offers, setOffers] = useState<CarpoolOffer[]>(INITIAL_OFFERS);
+  const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
+  const [offerForm, setOfferForm] = useState({
+    driverName: "",
+    from: "",
+    to: "",
+    date: "",
+    time: "",
+    seats: "3",
+    price: "8",
+  });
+
+  useEffect(() => {
+    if (location.pathname === "/oferecer-caronas") {
+      setIsOfferDialogOpen(true);
+    }
+  }, [location.pathname]);
+
   const stats = [
     {
       icon: TrendingDown,
@@ -146,9 +173,69 @@ export default function SmartCarpooling() {
     toast.success("Solicitação enviada! O motorista receberá sua mensagem.");
   };
 
+  const handleOfferFormChange = (field: keyof typeof offerForm, value: string) => {
+    setOfferForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleOfferRide = () => {
+    const { driverName, from, to, date, time, seats, price } = offerForm;
+
+    if (!driverName || !from || !to || !date || !time) {
+      toast.error("Preencha todos os campos obrigatórios para oferecer a carona.");
+      return;
+    }
+
+    const parsedSeats = Number.parseInt(seats, 10);
+    const parsedPrice = Number.parseFloat(price);
+
+    if (!Number.isFinite(parsedSeats) || parsedSeats < 1 || parsedSeats > 6) {
+      toast.error("Informe um número de vagas entre 1 e 6.");
+      return;
+    }
+
+    if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+      toast.error("Informe um valor por passageiro válido.");
+      return;
+    }
+
+    const departureDate = new Date(`${date}T${time}`);
+    const departureLabel = `${departureDate.toLocaleDateString("pt-BR")}, ${time}`;
+
+    const newOffer: CarpoolOffer = {
+      id: String(Date.now()),
+      driver: {
+        name: driverName,
+        rating: 5.0,
+        trips: 0,
+        verified: false,
+      },
+      from,
+      to,
+      departure: time,
+      date,
+      availableSeats: parsedSeats,
+      pricePerPerson: parsedPrice,
+      route: [from, to],
+      carModel: "Veículo pessoal",
+      amenities: ["AC"],
+    };
+
+    setOffers((prev) => [newOffer, ...prev]);
+    setIsOfferDialogOpen(false);
+    setOfferForm({
+      driverName: "",
+      from: "",
+      to: "",
+      date: "",
+      time: "",
+      seats: "3",
+      price: "8",
+    });
+    toast.success("Carona oferecida com sucesso! Sua oferta já aparece na lista.");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
       <div className="pt-20 pb-8 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
@@ -376,7 +463,10 @@ export default function SmartCarpooling() {
                   <p className="text-sm opacity-90 mb-6">
                     Ganhe dinheiro compartilhando seu trajeto diário
                   </p>
-                  <Button className="w-full bg-white text-green-600 hover:bg-gray-100">
+                  <Button
+                    className="w-full bg-white text-green-600 hover:bg-gray-100"
+                    onClick={() => navigate("/oferecer-caronas")}
+                  >
                     Oferecer Carona
                   </Button>
                 </CardContent>
@@ -444,6 +534,96 @@ export default function SmartCarpooling() {
           </div>
         </div>
       </div>
+
+      <Dialog open={isOfferDialogOpen} onOpenChange={setIsOfferDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Oferecer Carona</DialogTitle>
+            <DialogDescription>Preencha os detalhes da sua viagem.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="driverName">Seu nome</Label>
+              <Input
+                id="driverName"
+                value={offerForm.driverName}
+                onChange={(e) => handleOfferFormChange("driverName", e.target.value)}
+                placeholder="Ex: Ana Paula"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="from">Saindo de</Label>
+                <Input
+                  id="from"
+                  value={offerForm.from}
+                  onChange={(e) => handleOfferFormChange("from", e.target.value)}
+                  placeholder="Ex: Planaltina"
+                />
+              </div>
+              <div>
+                <Label htmlFor="to">Indo para</Label>
+                <Input
+                  id="to"
+                  value={offerForm.to}
+                  onChange={(e) => handleOfferFormChange("to", e.target.value)}
+                  placeholder="Ex: Taguatinga"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="date">Data</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={offerForm.date}
+                  onChange={(e) => handleOfferFormChange("date", e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="time">Hora</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={offerForm.time}
+                  onChange={(e) => handleOfferFormChange("time", e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="seats">Vagas</Label>
+                <Input
+                  id="seats"
+                  type="number"
+                  min={1}
+                  max={6}
+                  value={offerForm.seats}
+                  onChange={(e) => handleOfferFormChange("seats", e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="price">Preço por pessoa</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  min={0}
+                  step="0.5"
+                  value={offerForm.price}
+                  onChange={(e) => handleOfferFormChange("price", e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsOfferDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleOfferRide}>Salvar oferta</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

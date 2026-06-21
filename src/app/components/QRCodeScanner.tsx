@@ -54,7 +54,7 @@ export function QRCodeScanner() {
     setLastRead(rawValue);
 
     if (!slug) {
-      setMessage("QR Code lido, mas não reconhecido como parada do Nexus Mobility AI.");
+      setMessage("QR Code lido, mas não reconhecido como parada do Mobility IA.");
       return;
     }
 
